@@ -1,5 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
+
+{% load static %}
+
+<link rel="stylesheet" href="{% static 'orders/style.css' %}">
+
 <head>
     <meta charset="UTF-8">
     <title>Order Detail</title>
@@ -7,7 +12,14 @@
 <body>
     <h1>Order Detail</h1>
     <p>Order ID: {{ order.id }}</p>
-    <p>Customer: {{ order.customer }}</p>
+    <p>Customer: {{ order.customer.name }}</p>
+    <p>Products:</p>
+    <ul>
+        {% for product in order.products.all %}
+            <li>{{ product.name }} - Price: {{ product.price }}</li>
+        {% endfor %}
+    </ul>
+    <p>Total Price: {{ total_price|floatformat:2 }}</p>
     <p>Date Ordered: {{ order.date_ordered }}</p>
     <!-- Add more details as needed -->
 </body>

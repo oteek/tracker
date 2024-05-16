@@ -1,5 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
+
+{% load static %}
+
+<link rel="stylesheet" href="{% static 'orders/style.css' %}">
+
 <head>
     <meta charset="UTF-8">
     <title>Order List</title>
@@ -8,7 +13,9 @@
     <h1>Order List</h1>
     <ul>
     {% for order in orders %}
-        <li>{{ order.id }} - {{ order.customer }} - {{ order.date_ordered }}</li>
+        <li>
+            <a href="{% url 'order_detail' order.id %}">{{ order.id }} - {{ order.customer.name }} - {{ order.date_ordered }}</a>
+        </li>
     {% endfor %}
     </ul>
 </body>
