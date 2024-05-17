@@ -10,13 +10,20 @@
     <title>Order List</title>
 </head>
 <body>
+    {% if perms.orders.can_create_order %}
+        <a href="{% url 'create_order' %}">Create Order</a>
+    {% endif %}
     <h1>Order List</h1>
     <ul>
-    {% for order in orders %}
-        <li>
-            <a href="{% url 'order_detail' order.id %}">{{ order.id }} - {{ order.customer.name }} - {{ order.date_ordered }}</a>
-        </li>
-    {% endfor %}
+    {% if orders %}
+        {% for order in orders %}
+            <li>
+                <a href="{% url 'order_detail' order.id %}">{{ order.id }} - {{ order.user.username }} - {{ order.date_ordered }}</a>
+            </li>
+        {% endfor %}
+    {% else %}
+        <li>No orders available.</li>
+    {% endif %}
     </ul>
 </body>
 </html>
