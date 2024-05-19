@@ -10,7 +10,7 @@
     <title>Order List</title>
 </head>
 <body>
-    {% if perms.orders.can_create_order %}
+    {% if perms.orders.add_order %}
         <a href="{% url 'create_order' %}">Create Order</a>
     {% endif %}
     <h1>Order List</h1>

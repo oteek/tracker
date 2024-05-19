@@ -21,9 +21,4 @@ class Order(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, default=None)
     products = models.ManyToManyField(Product)
     date_ordered = models.DateTimeField(auto_now_add=True)
-    class Meta:
-        permissions = [
-            ("can_view_order", "Can view order"),
-            ("can_edit_order", "Can edit order"),
-        ]
     # Add more fields as needed, such as total amount, status, delivery address, etc.
