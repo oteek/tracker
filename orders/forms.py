@@ -3,15 +3,16 @@ from .models import Order, Product
 from django.contrib.auth.models import User
 
 class OrderForm(forms.ModelForm):
-    product_name = forms.CharField(max_length=100, required=False, label='Product Name')
-    product_description = forms.CharField(widget=forms.Textarea, required=False, label='Product Description')
-    product_price = forms.DecimalField(max_digits=10, decimal_places=2, required=False, label='Product Price')
-    # existing_product = forms.ModelChoiceField(queryset=Product.objects.all(), required=False, label='Existing Product')
-    # nera logikos naujiem uzsakymam prisegineti jau esamus produktus duombazej
-
     class Meta:
         model = Order
-        fields = ['product_name', 'product_description', 'product_price']
+        fields = ['order_name']
+
+class ProductForm(forms.ModelForm):
+    class Meta:
+        model = Product
+        fields = ['name', 'description', 'price']
+
+ProductFormSet = forms.modelformset_factory(Product, form=ProductForm, extra=1)
 
 class SignUpForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput)

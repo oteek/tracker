@@ -3,13 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <title>Create Order</title>
+    <style>
+        .form-row { margin-bottom: 10px; }
+    </style>
 </head>
 <body>
     <h1>Create Order</h1>
     <form method="post">
         {% csrf_token %}
-        {{ form.as_p }}
+        {{ order_form.as_p }}
+        <div id="product-forms">
+            {{ product_formset.management_form }}
+            {% for form in product_formset %}
+                <div class="form-row">{{ form.as_p }}</div>
+            {% endfor %}
+        </div>
+        <button type="button" id="add-product">Add another product</button>
         <button type="submit">Submit</button>
     </form>
+
+    <script>
+        document.getElementById('add-product').addEventListener('click', function () {
+            const formCount = document.getElementById('id_form-TOTAL_FORMS');
+            const currentFormCount = parseInt(formCount.value);
+            const newForm = document.createElement('div');
+            const formIndex = currentFormCount;
+            const emptyForm = document.querySelector('.form-row').cloneNode(true);
+            
+            // Update the form elements' name and id attributes
+            const regex = new RegExp(`form-(\\d+)-`, 'g');
+            newForm.innerHTML = emptyForm.innerHTML.replace(regex, `form-${formIndex}-`);
+            newForm.classList.add('form-row');
+            
+            document.getElementById('product-forms').appendChild(newForm);
+            formCount.value = currentFormCount + 1;
+        });
+    </script>
 </body>
 </html>

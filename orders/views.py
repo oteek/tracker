@@ -2,6 +2,8 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.models import User
 from django.contrib.auth import login, authenticate
 
+from django.forms import modelformset_factory
+
 from django.core.exceptions import PermissionDenied
 from django.http import Http404
 
@@ -9,7 +11,7 @@ from django.shortcuts import render, redirect
 from django.db.models import Sum
 
 from .models import Order, Product
-from .forms import OrderForm, SignUpForm
+from .forms import OrderForm, SignUpForm, ProductForm, ProductFormSet
 
 def home(request):
     return render(request, 'home.html')
@@ -51,34 +53,27 @@ def order_detail(request, order_id):
 @permission_required('orders.add_order', raise_exception=True)
 def create_order(request):
     if request.method == 'POST':
-        form = OrderForm(request.POST)
-        if form.is_valid():
-            # Create a new order and associate it with the current user
-            order = form.save(commit=False)
+        order_form = OrderForm(request.POST)
+        product_formset = ProductFormSet(request.POST, queryset=Product.objects.none())
+
+        if order_form.is_valid() and product_formset.is_valid():
+            order = order_form.save(commit=False)
             order.user = request.user
             order.save()
 
-            # Get the number of products from the form
-            num_products = form.cleaned_data.get('num_products', 2)  # Default to 0 if num_products is None
+            for form in product_formset:
+                product = form.save(commit=False)
+                product.user = request.user
+                product.save()
+                order.products.add(product)
 
-            # Iterate over the submitted product data to create and assign products to the order
-            for i in range(1, num_products + 1):  # Adjust the range as needed to handle multiple products
-                product_name = form.cleaned_data.get(f'product_name_{i}')
-                product_description = form.cleaned_data.get(f'product_description_{i}')
-                product_price = form.cleaned_data.get(f'product_price_{i}')
-                
-                # Only create a product if all fields are provided
-                if product_name and product_description and product_price:
-                    product = Product.objects.create(
-                        name=product_name,
-                        description=product_description,
-                        price=product_price,
-                        user=request.user  # Associate the product with the current user
-                    )
-                    order.products.add(product)
-            
             return redirect('order_list')
     else:
-        form = OrderForm()
-    return render(request, 'orders/create_order.html', {'form': form})
+        order_form = OrderForm()
+        product_formset = ProductFormSet(queryset=Product.objects.none())
+
+    return render(request, 'orders/create_order.html', {
+        'order_form': order_form,
+        'product_formset': product_formset,
+    })
 
