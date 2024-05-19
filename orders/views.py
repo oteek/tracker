@@ -39,8 +39,8 @@ def order_list(request):
 def order_detail(request, order_id):
     try:
         order = Order.objects.get(id=order_id)
-        # tikrina ar uzsakymas atitinka
         if order.user != request.user:
+            # jeigu orderio kurejas neatitinka dabartini prisiloginusi vartotoja, neleidzia jam perziuret to orderio
             raise PermissionDenied("You do not have permission to view this order.")
         total_price = order.products.all().aggregate(total_price=Sum('price'))['total_price']
         return render(request, 'orders/order_detail.html', {'order': order, 'total_price': total_price})

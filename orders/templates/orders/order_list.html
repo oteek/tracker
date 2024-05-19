@@ -10,6 +10,7 @@
     <title>Order List</title>
 </head>
 <body>
+    <a href="{% url 'home' %}">Back</a>
     {% if perms.orders.add_order %}
         <a href="{% url 'create_order' %}">Create Order</a>
     {% endif %}
