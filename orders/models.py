@@ -6,7 +6,6 @@ class Customer(models.Model):
     email = models.EmailField()
     def __str__(self):
         return self.name
-    # Add more fields as needed, such as address, phone number, etc.
 
 class Product(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, default=None)
