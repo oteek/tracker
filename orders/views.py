@@ -56,18 +56,28 @@ def create_order(request):
         order_form = OrderForm(request.POST)
         product_formset = ProductFormSet(request.POST, queryset=Product.objects.none())
 
-        if order_form.is_valid() and product_formset.is_valid():
-            order = order_form.save(commit=False)
-            order.user = request.user
-            order.save()
-
+        if order_form.is_valid():
+            valid_products = False
             for form in product_formset:
-                product = form.save(commit=False)
-                product.user = request.user
-                product.save()
-                order.products.add(product)
+                if form.is_valid() and form.cleaned_data.get('name'):
+                    valid_products = True
+                    break
 
-            return redirect('order_list')
+            if valid_products and product_formset.is_valid():
+                order = order_form.save(commit=False)
+                order.user = request.user
+                order.save()
+
+                for form in product_formset:
+                    if form.cleaned_data.get('name'):
+                        product = form.save(commit=False)
+                        product.user = request.user
+                        product.save()
+                        order.products.add(product)
+
+                return redirect('order_list')
+            else:
+                order_form.add_error(None, "You must add at least one valid product.")
     else:
         order_form = OrderForm()
         product_formset = ProductFormSet(queryset=Product.objects.none())

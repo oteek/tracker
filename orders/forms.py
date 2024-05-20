@@ -11,6 +11,10 @@ class ProductForm(forms.ModelForm):
     class Meta:
         model = Product
         fields = ['name', 'description', 'price']
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['price'].required = True
 
 ProductFormSet = forms.modelformset_factory(Product, form=ProductForm, extra=1)
 

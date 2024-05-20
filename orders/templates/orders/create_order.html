@@ -5,6 +5,7 @@
     <title>Create Order</title>
     <style>
         .form-row { margin-bottom: 10px; }
+        .remove-button { margin-left: 10px; color: red; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -15,7 +16,12 @@
         <div id="product-forms">
             {{ product_formset.management_form }}
             {% for form in product_formset %}
-                <div class="form-row">{{ form.as_p }}</div>
+                <div class="form-row">
+                    {{ form.as_p }}
+                    {% if not forloop.first %}
+                        <span class="remove-button" onclick="removeProductForm(this)">Remove</span>
+                    {% endif %}
+                </div>
             {% endfor %}
         </div>
         <button type="button" id="add-product">Add another product</button>
@@ -27,17 +33,65 @@
             const formCount = document.getElementById('id_form-TOTAL_FORMS');
             const currentFormCount = parseInt(formCount.value);
             const newForm = document.createElement('div');
-            const formIndex = currentFormCount;
-            const emptyForm = document.querySelector('.form-row').cloneNode(true);
-            
-            // Update the form elements' name and id attributes
-            const regex = new RegExp(`form-(\\d+)-`, 'g');
-            newForm.innerHTML = emptyForm.innerHTML.replace(regex, `form-${formIndex}-`);
             newForm.classList.add('form-row');
-            
+            newForm.innerHTML = document.querySelector('.form-row').innerHTML.replace(/form-(\d+)-/g, `form-${currentFormCount}-`);
+
+            // Add remove button to new form
+            const removeButton = document.createElement('span');
+            removeButton.classList.add('remove-button');
+            removeButton.innerText = 'Remove';
+            removeButton.setAttribute('onclick', 'removeProductForm(this)');
+            newForm.appendChild(removeButton);
+
+            // Append new form and update management form
             document.getElementById('product-forms').appendChild(newForm);
             formCount.value = currentFormCount + 1;
         });
+
+        function removeProductForm(button) {
+            const formCount = document.getElementById('id_form-TOTAL_FORMS');
+            const currentFormCount = parseInt(formCount.value);
+
+            if (currentFormCount > 1) {
+                // Remove the parent form-row
+                button.parentElement.remove();
+                formCount.value = currentFormCount - 1;
+
+                // Preserve input values before re-indexing
+                const forms = document.querySelectorAll('.form-row');
+                const data = Array.from(forms).map(form => {
+                    const inputs = form.querySelectorAll('input, textarea');
+                    return Array.from(inputs).reduce((obj, input) => {
+                        obj[input.name] = input.value;
+                        return obj;
+                    }, {});
+                });
+
+                // Re-index the remaining forms
+                forms.forEach((form, index) => {
+                    form.innerHTML = form.innerHTML.replace(/form-(\d+)-/g, `form-${index}-`);
+                });
+
+                // Restore input values after re-indexing
+                forms.forEach((form, index) => {
+                    const inputs = form.querySelectorAll('input, textarea');
+                    inputs.forEach(input => {
+                        input.value = data[index][input.name];
+                    });
+                });
+
+                // Add remove buttons to newly indexed forms, except the first one
+                forms.forEach((form, index) => {
+                    if (index > 0 && !form.querySelector('.remove-button')) {
+                        const removeButton = document.createElement('span');
+                        removeButton.classList.add('remove-button');
+                        removeButton.innerText = 'Remove';
+                        removeButton.setAttribute('onclick', 'removeProductForm(this)');
+                        form.appendChild(removeButton);
+                    }
+                });
+            }
+        }
     </script>
 </body>
 </html>
