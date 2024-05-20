@@ -1,5 +1,6 @@
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.models import User
+from django.contrib.auth.models import Group
 from django.contrib.auth import login, authenticate
 
 from django.forms import modelformset_factory
@@ -23,6 +24,11 @@ def signup(request):
             user = form.save(commit=False)
             user.set_password(form.cleaned_data['password'])
             user.save()
+
+            # turbut bloga strategija jeigu svari duombaze neturi customer grupes bet dabar laiko ir taip nera kazka galvoti
+            customer_group = Group.objects.get(name='Customer')
+            user.groups.add(customer_group)
+
             login(request, user)
             return redirect('home')
     else:

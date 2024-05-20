@@ -18,10 +18,10 @@
     <p>Products:</p>
     <ul>
         {% for product in order.products.all %}
-            <li>{{ product.name }} - Price: {{ product.price }}</li>
+            <li>{{ product.name }} - Price: {{ product.price }} €</li>
         {% endfor %}
     </ul>
-    <p>Total Price: {{ total_price|floatformat:2 }}</p>
+    <p>Total Price: {{ total_price|floatformat:2 }} €</p>
     <p>Date Ordered: {{ order.date_ordered }}</p>
 </body>
 </html>
