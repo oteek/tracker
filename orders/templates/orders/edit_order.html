@@ -2,15 +2,16 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Create Order</title>
+    <title>Edit Order</title>
     <style>
         .form-row { margin-bottom: 10px; }
         .remove-button { margin-left: 10px; color: red; cursor: pointer; }
+        .hidden { display: none; }
     </style>
 </head>
 <body>
     <a href="{% url 'order_list' %}">Back</a>
-    <h1>Create Order</h1>
+    <h1>Edit Order</h1>
     <form method="post">
         {% csrf_token %}
         {{ order_form.as_p }}
@@ -18,6 +19,7 @@
             {{ product_formset.management_form }}
             {% for form in product_formset %}
                 <div class="form-row">
+                    {{ form.id }}
                     <div class="form-row">
                         {{ form.name.errors }}
                         <p>{{ form.name.label }}: {{ form.name }}</p>
@@ -25,24 +27,31 @@
                         <p>{{ form.description.label }}: {{ form.description }}</p>
                         {{ form.price.errors }}
                         <p>{{ form.price.label }}: {{ form.price }} €</p>
+                        {% if form.instance.pk %}
+                            Delete {{ form.DELETE }}
+                        {% endif %}
                     </div>
-                    {% if not forloop.first %}
+                    {% if forloop.last and not form.instance.pk %}
                         <span class="remove-button" onclick="removeProductForm(this)">Remove</span>
                     {% endif %}
                 </div>
             {% endfor %}
         </div>
         <button type="button" id="add-product">Add another product</button>
-        <button type="submit">Submit</button>
+        <button type="submit">Save</button>
     </form>
 
     <script>
         document.getElementById('add-product').addEventListener('click', function () {
+            addProductForm();
+        });
+
+        function addProductForm() {
             const formCount = document.getElementById('id_form-TOTAL_FORMS');
             const currentFormCount = parseInt(formCount.value);
             const newForm = document.createElement('div');
             newForm.classList.add('form-row');
-            newForm.innerHTML = document.querySelector('.form-row').innerHTML.replace(/form-(\d+)-/g, `form-${currentFormCount}-`);
+            newForm.innerHTML = document.querySelector('.form-row').innerHTML.replace(/form-\d+-/g, `form-${currentFormCount}-`);
 
             // Add remove button to the new form
             const removeButton = document.createElement('span');
@@ -54,51 +63,24 @@
             // Append the new form
             document.getElementById('product-forms').appendChild(newForm);
             formCount.value = currentFormCount + 1;
-        });
-
+        }
+    
         function removeProductForm(button) {
-            const formCount = document.getElementById('id_form-TOTAL_FORMS');
-            const currentFormCount = parseInt(formCount.value);
+            const formRow = button.parentElement;
+            const deleteCheckbox = formRow.querySelector('input[type="checkbox"]');
 
-            if (currentFormCount > 1) {
-                button.parentElement.remove();
-                formCount.value = currentFormCount - 1;
-
-                // Save the current data before reindexing
-                const forms = document.querySelectorAll('.form-row');
-                const data = Array.from(forms).map(form => {
-                    const inputs = form.querySelectorAll('input, textarea');
-                    return Array.from(inputs).reduce((obj, input) => {
-                        obj[input.name] = input.value;
-                        return obj;
-                    }, {});
-                });
+            if (deleteCheckbox) {
+                deleteCheckbox.checked = true;
+                formRow.classList.add('hidden');
+            } else {
+                formRow.remove();
+                const formCount = document.getElementById('id_form-TOTAL_FORMS');
+                formCount.value = parseInt(formCount.value) - 1;
 
                 // Reassign indices
+                const forms = document.querySelectorAll('.form-row');
                 forms.forEach((form, index) => {
                     form.innerHTML = form.innerHTML.replace(/form-(\d+)-/g, `form-${index}-`);
-                });
-
-                // Restore data
-                forms.forEach((form, index) => {
-                    const inputs = form.querySelectorAll('input, textarea');
-                    inputs.forEach(input => {
-                        input.value = data[index][input.name];
-                    });
-                });
-
-                // Ensure remove button exists on all but the first form
-                forms.forEach((form, index) => {
-                    const removeButton = form.querySelector('.remove-button');
-                    if (index > 0 && !removeButton) {
-                        const newRemoveButton = document.createElement('span');
-                        newRemoveButton.classList.add('remove-button');
-                        newRemoveButton.innerText = 'Remove';
-                        newRemoveButton.setAttribute('onclick', 'removeProductForm(this)');
-                        form.appendChild(newRemoveButton);
-                    } else if (index === 0 && removeButton) {
-                        removeButton.remove();
-                    }
                 });
             }
         }

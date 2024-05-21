@@ -1,6 +1,8 @@
 from django import forms
-from .models import Order, Product
+from django.forms import modelformset_factory
 from django.contrib.auth.models import User
+
+from .models import Order, Product
 
 class OrderForm(forms.ModelForm):
     class Meta:
@@ -16,7 +18,9 @@ class ProductForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['price'].required = True
 
-ProductFormSet = forms.modelformset_factory(Product, form=ProductForm, extra=1)
+ProductFormSet = modelformset_factory(Product, form=ProductForm, extra=0, can_delete=True)
+# ProductFormSet = forms.modelformset_factory(Product, form=ProductForm, extra=1)
+# ProductFormSet = inlineformset_factory(Order, Product, form=ProductForm, extra=1, can_delete=True)
 
 class SignUpForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput)

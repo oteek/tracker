@@ -20,5 +20,5 @@ class Order(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, default=None)
     products = models.ManyToManyField(Product)
     date_ordered = models.DateTimeField(auto_now_add=True)
-    order_name = models.CharField(max_length=100)  # Add order name field
+    order_name = models.CharField(max_length=100)
     # Add more fields as needed, such as total amount, status, delivery address, etc.
