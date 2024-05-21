@@ -2,6 +2,7 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.models import User
 from django.contrib.auth.models import Group
 from django.contrib.auth import login, authenticate
+from django.contrib import messages
 
 from django.forms import modelformset_factory
 
@@ -13,6 +14,7 @@ from django.db.models import Sum
 
 from .models import Order, Product
 from .forms import OrderForm, SignUpForm, ProductForm, ProductFormSet
+
 
 def get_product_formset(extra):
     return modelformset_factory(Product, form=ProductForm, extra=extra, can_delete=True)
@@ -84,6 +86,7 @@ def create_order(request):
                         product.save()
                         order.products.add(product)
 
+                messages.success(request, 'Order created successfully!')
                 return redirect('order_list')
             else:
                 order_form.add_error(None, "You must add at least one valid product.")
@@ -121,6 +124,7 @@ def edit_order(request, order_id):
                     product.save()
                     order.products.add(product)
 
+            messages.success(request, 'Order edited successfully!')
             return redirect('order_list')
     else:
         order_form = OrderForm(instance=order)
@@ -143,6 +147,7 @@ def delete_order(request, order_id):
         if request.method == 'POST':
             order.products.all().delete()
             order.delete()
+            messages.success(request, 'Order deleted successfully!')
             return redirect('order_list')
         return render(request, 'orders/delete_order.html', {'order': order})
     except PermissionDenied as e:

@@ -18,9 +18,9 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ml-auto">
                     {% if user.is_authenticated %}
-                        <li class="nav-item">
+                        <!-- <li class="nav-item">
                             <span class="nav-link">Welcome, {{ user.username }}!</span>
-                        </li>
+                        </li> -->
                         {% if user.is_superuser %}
                             <li class="nav-item">
                                 <a class="nav-link" href="{% url 'admin:index' %}">Admin Dashboard</a>
@@ -48,7 +48,11 @@
         </nav>
 
         <div class="jumbotron mt-4">
-            <h1 class="display-4">Welcome to the Home Page</h1>
+            {% if user.is_authenticated %}
+                <h1 class="display-4">Welcome, {{ user.username }}!</h1>
+            {% else %}
+                <h1 class="display-4">Welcome to the Home Page</h1>
+            {% endif %}
             <p class="lead">This is the basic home page.</p>
         </div>
     </div>
