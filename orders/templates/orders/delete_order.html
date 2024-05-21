@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <title>Delete Order</title>
+    {% load static %}
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'order.css' %}">
 </head>
 <body>
     <div class="container-fluid">
@@ -17,13 +19,27 @@
             </div>
         </nav>
 
-        <h1>Delete Order</h1>
-        <p>Are you sure you want to delete the order "{{ order.order_name }}"?</p>
-        <form method="post">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-outline-danger">Yes, delete</button>
-            <a href="{% url 'order_detail' order.id %}">Cancel</a>
-        </form>
+        <div class="order-container">
+            <div class="order-header">
+                <h1>Delete Order</h1>
+            </div>
+
+            <div class="card order-card">
+                <div class="card-body">
+                    <div class="order-header">
+                        <h5>Are you sure you want to delete the order "{{ order.order_name }}"?</h5>
+                        <p>This action cannot be undone.</p>
+                    </div>
+                    <div class="order-actions">
+                        <form method="post">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-outline-danger">Delete</button>
+                            <a href="{% url 'order_detail' order.id %}" class="btn btn-primary">Cancel</a>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.6.0/dist/umd/popper.min.js"></script>
