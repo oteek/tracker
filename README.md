@@ -1,6 +1,7 @@
 # Create and activate virtual environment
-virtualenv -p python3 env
-. ./env/bin/activate
+python -m venv venv
+
+venv\Scripts\activate
 
 # Install Python dependencies
 pip install -r requirements.txt
