@@ -18,6 +18,12 @@ class ProductForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['price'].required = True
 
+    def clean_price(self):
+        price = self.cleaned_data.get('price')
+        if price is not None and price < 0:
+            raise forms.ValidationError("Price cannot be negative.")
+        return price
+
 ProductFormSet = modelformset_factory(Product, form=ProductForm, extra=0, can_delete=True)
 # ProductFormSet = forms.modelformset_factory(Product, form=ProductForm, extra=1)
 # ProductFormSet = inlineformset_factory(Order, Product, form=ProductForm, extra=1, can_delete=True)
