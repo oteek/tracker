@@ -4,11 +4,14 @@ python -m venv venv
 venv\Scripts\activate
 
 # Install Python dependencies
+cd [folder where this project's manage.py is]
+
 pip install -r requirements.txt
 
 # Create SQLite databse, run migrations
-cd myapp
-./manage.py migrate
+
+python manage.py migrate
 
 # Run Django dev server
-./manage.py runserver
+
+python manage.py runserver
