@@ -7,39 +7,60 @@
         .form-row { margin-bottom: 10px; }
         .remove-button { margin-left: 10px; color: red; cursor: pointer; }
         .hidden { display: none; }
+        textarea {
+            resize: none; /* Disable resizing */
+            height: 30px; /* Set a fixed height */
+        }
     </style>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet"> 
 </head>
 <body>
-    <a href="{% url 'order_list' %}">Back</a>
-    <h1>Edit Order</h1>
-    <form method="post">
-        {% csrf_token %}
-        {{ order_form.as_p }}
-        <div id="product-forms">
-            {{ product_formset.management_form }}
-            {% for form in product_formset %}
-                <div class="form-row">
-                    {{ form.id }}
+    <div class="container-fluid">
+        
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <a class="navbar-brand" href="{% url 'home' %}">Home</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'order_list' %}">Back</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <h1>Edit Order</h1>
+        <form method="post">
+            {% csrf_token %}
+            {{ order_form.as_p }}
+            <div id="product-forms">
+                {{ product_formset.management_form }}
+                {% for form in product_formset %}
                     <div class="form-row">
-                        {{ form.name.errors }}
-                        <p>{{ form.name.label }}: {{ form.name }}</p>
-                        {{ form.description.errors }}
-                        <p>{{ form.description.label }}: {{ form.description }}</p>
-                        {{ form.price.errors }}
-                        <p>{{ form.price.label }}: {{ form.price }} €</p>
-                        {% if form.instance.pk %}
-                            Delete {{ form.DELETE }}
+                        {{ form.id }}
+                        <div class="form-row">
+                            {{ form.name.errors }}
+                            <p>{{ form.name.label }}: {{ form.name }}</p>
+                            {{ form.description.errors }}
+                            <p>{{ form.description.label }}: {{ form.description }}</p>
+                            {{ form.price.errors }}
+                            <p>{{ form.price.label }}: {{ form.price }} €</p>
+                            {% if form.instance.pk %}
+                                Delete {{ form.DELETE }}
+                            {% endif %}
+                        </div>
+                        {% if forloop.last and not form.instance.pk %}
+                            <span class="remove-button" onclick="removeProductForm(this)">Remove</span>
                         {% endif %}
                     </div>
-                    {% if forloop.last and not form.instance.pk %}
-                        <span class="remove-button" onclick="removeProductForm(this)">Remove</span>
-                    {% endif %}
-                </div>
-            {% endfor %}
-        </div>
-        <button type="button" id="add-product">Add another product</button>
-        <button type="submit">Save</button>
-    </form>
+                {% endfor %}
+            </div>
+            <button type="button" id="add-product">Add another product</button>
+            <button type="submit">Save</button>
+        </form>
+    </div>
 
     <script>
         document.getElementById('add-product').addEventListener('click', function () {

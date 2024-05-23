@@ -86,7 +86,7 @@ def create_order(request):
                         product.save()
                         order.products.add(product)
 
-                messages.success(request, 'Order created successfully!')
+                messages.success(request, 'Order #{} created successfully!'.format(order.id))
                 return redirect('order_list')
             else:
                 order_form.add_error(None, "You must add at least one valid product.")
@@ -124,7 +124,7 @@ def edit_order(request, order_id):
                     product.save()
                     order.products.add(product)
 
-            messages.success(request, 'Order edited successfully!')
+            messages.success(request, 'Order #{} edited successfully!'.format(order.id))
             return redirect('order_list')
     else:
         order_form = OrderForm(instance=order)
@@ -145,9 +145,9 @@ def delete_order(request, order_id):
         if order.user != request.user:
             raise PermissionDenied("You do not have permission to delete this order.")
         if request.method == 'POST':
+            messages.success(request, 'Order #{} deleted successfully!'.format(order.id))
             order.products.all().delete()
             order.delete()
-            messages.success(request, 'Order deleted successfully!')
             return redirect('order_list')
         return render(request, 'orders/delete_order.html', {'order': order})
     except PermissionDenied as e:

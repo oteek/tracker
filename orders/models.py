@@ -27,4 +27,6 @@ class Order(models.Model):
     products = models.ManyToManyField(Product)
     date_ordered = models.DateTimeField(auto_now_add=True)
     order_name = models.CharField(max_length=100)
+    def __str__(self):
+        return self.order_name
     # Add more fields as needed, such as total amount, status, delivery address, etc.
