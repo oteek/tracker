@@ -15,3 +15,8 @@ python manage.py migrate
 # Run Django dev server
 
 python manage.py runserver
+
+# User Accounts
+password: 123456789
+
+usernames: admin, Rimantas, Sigitas, Lukas
