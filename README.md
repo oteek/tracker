@@ -8,7 +8,8 @@ pip install -r requirements.txt
 
 # Create SQLite databse, run migrations
 cd myapp
-./manage.py migrate
+python manage.py migrate
 
 # Run Django dev server
-./manage.py runserver
+cd myapp
+python manage.py runserver
