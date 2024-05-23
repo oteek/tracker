@@ -102,39 +102,45 @@ def create_order(request):
 @login_required
 @permission_required('orders.change_order', raise_exception=True)
 def edit_order(request, order_id):
-    order = get_object_or_404(Order, id=order_id, user=request.user)
+    try:
+        order = Order.objects.get(id=order_id)
+        if order.user != request.user:
+            raise PermissionDenied("You do not have permission to edit this order.")
+        if request.method == 'POST':
+            order_form = OrderForm(request.POST, instance=order)
+            product_formset = ProductFormSet(request.POST, queryset=order.products.all())
+            
+            if order_form.is_valid() and product_formset.is_valid():
+                order = order_form.save(commit=False)
+                order.user = request.user
+                order.save()
 
-    if request.method == 'POST':
-        order_form = OrderForm(request.POST, instance=order)
-        product_formset = ProductFormSet(request.POST, queryset=order.products.all())
-        
-        if order_form.is_valid() and product_formset.is_valid():
-            order = order_form.save(commit=False)
-            order.user = request.user
-            order.save()
+                # Save the products and handle deletions
+                for form in product_formset:
+                    if form.cleaned_data.get('DELETE'):
+                        if form.instance.pk:
+                            form.instance.delete()
+                    else:
+                        product = form.save(commit=False)
+                        product.user = request.user
+                        product.save()
+                        order.products.add(product)
 
-            # Save the products and handle deletions
-            for form in product_formset:
-                if form.cleaned_data.get('DELETE'):
-                    if form.instance.pk:
-                        form.instance.delete()
-                else:
-                    product = form.save(commit=False)
-                    product.user = request.user
-                    product.save()
-                    order.products.add(product)
+                messages.success(request, 'Order #{} edited successfully!'.format(order.id))
+                return redirect('order_list')
+        else:
+            order_form = OrderForm(instance=order)
+            product_formset = ProductFormSet(queryset=order.products.all())
 
-            messages.success(request, 'Order #{} edited successfully!'.format(order.id))
-            return redirect('order_list')
-    else:
-        order_form = OrderForm(instance=order)
-        product_formset = ProductFormSet(queryset=order.products.all())
-
-    return render(request, 'orders/edit_order.html', {
-        'order': order,
-        'order_form': order_form,
-        'product_formset': product_formset,
-    })
+        return render(request, 'orders/edit_order.html', {
+            'order': order,
+            'order_form': order_form,
+            'product_formset': product_formset,
+        })
+    except PermissionDenied as e:
+        return render(request, 'orders/error.html', {'message': str(e)})
+    except Order.DoesNotExist:
+        return render(request, 'orders/error.html', {'message': "Order does not exist."})
 
 
 @login_required
