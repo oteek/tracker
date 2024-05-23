@@ -43,3 +43,9 @@ class SignUpForm(forms.ModelForm):
 
         if password != confirm_password:
             raise forms.ValidationError("Passwords do not match")
+        
+# susijęs su vartotojo paskyros redagavimu, kol kas neimplementuota, iki 06-10 jau turetų būti
+class UserProfileForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ['first_name', 'last_name', 'email']
