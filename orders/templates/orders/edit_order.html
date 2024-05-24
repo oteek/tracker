@@ -42,13 +42,13 @@
                         {{ form.id }}
                         <div class="form-row">
                             {{ form.name.errors }}
-                            <p>{{ form.name.label }}: {{ form.name }}</p>
+                            <p>&nbsp;&nbsp;&nbsp;{{ form.name.label }}: {{ form.name }}</p>
                             {{ form.description.errors }}
-                            <p>{{ form.description.label }}: {{ form.description }}</p>
+                            <p>&nbsp;&nbsp;&nbsp;{{ form.description.label }}: {{ form.description }}</p>
                             {{ form.price.errors }}
-                            <p>{{ form.price.label }}: {{ form.price }} €</p>
+                            <p>&nbsp;&nbsp;&nbsp;{{ form.price.label }}: {{ form.price }} €</p>
                             {% if form.instance.pk %}
-                                Delete {{ form.DELETE }}
+                                &nbsp;&nbsp;&nbsp;Delete&nbsp;&nbsp;&nbsp;{{ form.DELETE }}
                             {% endif %}
                         </div>
                         {% if forloop.last and not form.instance.pk %}
