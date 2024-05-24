@@ -64,7 +64,7 @@ def order_detail(request, order_id):
 @permission_required('orders.add_order', raise_exception=True)
 def create_order(request):
     if request.method == 'POST':
-        order_form = OrderForm(request.POST)
+        order_form = OrderForm(request.POST)    #forma
         product_formset = get_product_formset(extra=1)(request.POST, queryset=Product.objects.none())
 
         if order_form.is_valid():
@@ -75,6 +75,7 @@ def create_order(request):
                     break
 
             if valid_products and product_formset.is_valid():
+                # jeigu egzistuoja produktai ir ju formos teisingai uzpildytos, issaugoti kartu su produktais
                 order = order_form.save(commit=False)
                 order.user = request.user
                 order.save()
